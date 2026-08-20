@@ -243,12 +243,6 @@ class DatabaseSeeder extends Seeder
                     
                 ],
             ],
-            'Dune: Part Two' => [
-                '2026-08-18' => [
-                    'CineBook Thủ Đức'  => ['10:30', '14:00', '17:30', '21:00'],
-                    'CineBook Giga Mall'    => ['09:00', '12:30', '16:00', '19:30', '22:30'],
-                ],
-            ],
         ];
  
         foreach ($schedule as $movieName => $dateSchedule) {
