@@ -213,6 +213,8 @@ class DatabaseSeeder extends Seeder
                 ),
             ];
         }
+
+        $this->call(SeatSeeder::class);
  
         // ===================== SHOWTIMES =====================
         Showtime::query()->delete();
