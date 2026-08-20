@@ -19,21 +19,21 @@
                         <i class="fa-solid fa-map-location-dot text-red-500 text-xl mt-1 mr-4 w-6 text-center"></i>
                         <div>
                             <strong class="block text-white">Văn Phòng Chính</strong>
-                            285 Cách Mạng Tháng Tám, Phường 12, Quận 10, TP.HCM
+                            21 đường số 13,Khu phố 4,phường Hiêp Bình ,Thủ Đức, TP.HCM
                         </div>
                     </li>
                     <li class="flex items-start">
                         <i class="fa-solid fa-phone text-red-500 text-xl mt-1 mr-4 w-6 text-center"></i>
                         <div>
-                            <strong class="block text-white">Hotline Hotline Hỗ Trợ</strong>
-                            1900 1234 (8:00 - 22:00)
+                            <strong class="block text-white">Hotline Hỗ Trợ</strong>
+                            0943980066 (24/24)
                         </div>
                     </li>
                     <li class="flex items-start">
                         <i class="fa-solid fa-envelope text-red-500 text-xl mt-1 mr-4 w-6 text-center"></i>
                         <div>
                             <strong class="block text-white">Email CSKH</strong>
-                            support@cinebook.vn
+                            info@jga.com.vn
                         </div>
                     </li>
                 </ul>
