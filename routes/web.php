@@ -20,8 +20,6 @@ use App\Http\Controllers\ReviewController;
 Route::patch('/admin/posts/{id}/toggle', [PostController::class, 'toggle'])
     ->name('admin.posts.toggle');
 Route::get('/posts/{id}', [PostController::class, 'show'])->name('posts.show');
-Route::delete('/admin/posts/{id}', [PostController::class, 'destroy'])
-    ->name('admin.posts.destroy');
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('posts', PostController::class);
 });
