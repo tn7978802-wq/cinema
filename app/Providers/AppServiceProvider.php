@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 use Laravel\Socialite\Facades\Socialite;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (app()->environment('production')) {
+            URL::forceRootUrl(config('app.url'));
+            URL::forceScheme('https');
+        }
+
         app()->setLocale(session('locale', config('app.locale', 'vi')));
 
         // GRACE: Chien thuat "Stateless & SSL Bypass" - Giai quyet dut diem loi Login Google local
