@@ -15,17 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('address')->nullable();
-            $table->timestamps();
-            $table->string('district')->nullable()->after('address');
-            $table->string('phone')->nullable()->after('district');
-            $table->string('hours')->nullable()->after('phone');
-            $table->integer('screens')->default(0)->after('hours');
-            $table->integer('seats')->default(0)->after('screens');
+            $table->string('district')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('hours')->nullable();
+            $table->integer('screens')->default(0);
+            $table->integer('seats')->default(0);
             // Lưu dạng JSON: ["IMAX","4DX","Dolby","VIP"]
-            $table->json('features')->nullable()->after('seats');
-            $table->string('image')->nullable()->after('features');
-            $table->string('map')->nullable()->after('image');
-            $table->string('status')->default('open')->after('map');
+            $table->json('features')->nullable();
+            $table->string('image')->nullable();
+            $table->string('map')->nullable();
+            $table->string('status')->default('open');
+            $table->timestamps();
         });
 
         Schema::create('subtitles', function (Blueprint $table) {
