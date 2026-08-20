@@ -124,6 +124,13 @@ class DashboardController extends Controller
 
     private function buildLiveShowtimes(): Collection
     {
+        $driver = DB::connection()->getDriverName();
+        $showtimeEndExpression = match ($driver) {
+            'pgsql' => 'st.start_time + make_interval(mins => COALESCE(m.duration, 120))',
+            'mysql', 'mariadb' => 'DATE_ADD(st.start_time, INTERVAL COALESCE(m.duration, 120) MINUTE)',
+            default => "datetime(st.start_time, '+' || COALESCE(m.duration, 120) || ' minutes')",
+        };
+
         $rows = DB::table('showtimes as st')
             ->join('movies as m', 'm.id', '=', 'st.movie_id')
             ->join('rooms as r', 'r.id', '=', 'st.room_id')
@@ -131,7 +138,7 @@ class DashboardController extends Controller
             ->leftJoin('tickets as t', 't.showtime_id', '=', 'st.id')
             ->leftJoin('ticket_details as td', 'td.ticket_id', '=', 't.id')
             ->where('st.start_time', '<=', now())
-            ->whereRaw("st.start_time + make_interval(mins => COALESCE(m.duration, 120)) >= ?", [now()])
+            ->whereRaw($showtimeEndExpression.' >= ?', [now()])
             ->groupBy('st.id', 'st.start_time', 'm.name', 'm.duration', 'r.name', 'r.seat_count', 'c.name')
             ->orderBy('st.start_time')
             ->selectRaw('
@@ -284,16 +291,23 @@ class DashboardController extends Controller
 
     private function revenueSeries(string $range, Carbon $start, Carbon $end): Collection
     {
+        $driver = DB::connection()->getDriverName();
+        $bucketExpression = match ($driver) {
+            'pgsql' => $range === 'day'
+                ? 'EXTRACT(HOUR FROM booking_date)'
+                : 'DATE(booking_date)',
+            'mysql', 'mariadb' => $range === 'day'
+                ? 'HOUR(booking_date)'
+                : 'DATE(booking_date)',
+            default => $range === 'day'
+                ? "CAST(strftime('%H', booking_date) AS INTEGER)"
+                : 'date(booking_date)',
+        };
+
         $rows = DB::table('tickets')
             ->whereBetween('booking_date', [$start, $end])
-            ->selectRaw(
-                match ($range) {
-                    'week' => "TO_CHAR(booking_date, 'Dy') as bucket_label, DATE(booking_date) as bucket_key, COALESCE(SUM(COALESCE(final_price, total_price)), 0) as revenue",
-                    'month' => "TO_CHAR(booking_date, 'DD') as bucket_label, DATE(booking_date) as bucket_key, COALESCE(SUM(COALESCE(final_price, total_price)), 0) as revenue",
-                    default => "TO_CHAR(booking_date, 'HH24') as bucket_label, EXTRACT(HOUR FROM booking_date) as bucket_key, COALESCE(SUM(COALESCE(final_price, total_price)), 0) as revenue",
-                }
-            )
-            ->groupBy('bucket_label', 'bucket_key')
+            ->selectRaw($bucketExpression.' as bucket_key, COALESCE(SUM(COALESCE(final_price, total_price)), 0) as revenue')
+            ->groupBy('bucket_key')
             ->orderBy('bucket_key')
             ->get()
             ->keyBy(fn ($row) => (string) $row->bucket_key);
@@ -382,9 +396,15 @@ class DashboardController extends Controller
 
     private function bookingHourDistribution(Carbon $start, Carbon $end): Collection
     {
+        $hourExpression = match (DB::connection()->getDriverName()) {
+            'pgsql' => 'EXTRACT(HOUR FROM booking_date)',
+            'mysql', 'mariadb' => 'HOUR(booking_date)',
+            default => "CAST(strftime('%H', booking_date) AS INTEGER)",
+        };
+
         $rows = DB::table('tickets')
             ->whereBetween('booking_date', [$start, $end])
-            ->selectRaw('EXTRACT(HOUR FROM booking_date) as booking_hour, COUNT(*) as total')
+            ->selectRaw($hourExpression.' as booking_hour, COUNT(*) as total')
             ->groupBy('booking_hour')
             ->orderBy('booking_hour')
             ->get()
@@ -405,9 +425,15 @@ class DashboardController extends Controller
 
     private function popularBookingHour(Carbon $start, Carbon $end): array
     {
+        $hourExpression = match (DB::connection()->getDriverName()) {
+            'pgsql' => 'EXTRACT(HOUR FROM booking_date)',
+            'mysql', 'mariadb' => 'HOUR(booking_date)',
+            default => "CAST(strftime('%H', booking_date) AS INTEGER)",
+        };
+
         $row = DB::table('tickets')
             ->whereBetween('booking_date', [$start, $end])
-            ->selectRaw('EXTRACT(HOUR FROM booking_date) as booking_hour, COUNT(*) as total')
+            ->selectRaw($hourExpression.' as booking_hour, COUNT(*) as total')
             ->groupBy('booking_hour')
             ->orderByDesc('total')
             ->orderBy('booking_hour')

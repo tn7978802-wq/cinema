@@ -11,6 +11,12 @@ class UserController extends Controller
 {
     public function index()
     {
+        $hourExpression = match (DB::connection()->getDriverName()) {
+            'pgsql' => 'EXTRACT(HOUR FROM showtimes.start_time)',
+            'mysql', 'mariadb' => 'HOUR(showtimes.start_time)',
+            default => "CAST(strftime('%H', showtimes.start_time) AS INTEGER)",
+        };
+
         $users = User::query()
             ->addSelect([
                 'total_spent' => DB::table('tickets')
@@ -28,8 +34,8 @@ class UserController extends Controller
                 'favorite_hour' => DB::table('tickets')
                     ->join('showtimes', 'tickets.showtime_id', '=', 'showtimes.id')
                     ->whereColumn('tickets.user_id', 'Users.id')
-                    ->selectRaw('EXTRACT(HOUR FROM showtimes.start_time)')
-                    ->groupByRaw('EXTRACT(HOUR FROM showtimes.start_time)')
+                    ->selectRaw($hourExpression)
+                    ->groupByRaw($hourExpression)
                     ->orderByRaw('COUNT(*) DESC')
                     ->limit(1),
             ])

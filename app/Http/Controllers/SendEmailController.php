@@ -11,13 +11,13 @@ class SendEmailController extends Controller
     {
         // Truyền dữ liệu vào template
         $data = [
-            'name' => ' Thiên Ân',
+            'name' => ' Văn Toàn',
         ];
 
         // Dùng Mail::send thay vì Mail::raw để gọi template HTML (resources/views/emails/business.blade.php)
         Mail::send('emails.business', $data, function ($message) {
-            $message->to('loancao954@gmail.com') // Có thể thay bằng email sếp muốn test
-                ->subject('🎬 [CINEBOOK] Thư chào mừng từ dự án Cinema của sếp Thiên Ân!');
+            $message->to('tn7410311@gmail.com') // Có thể thay bằng email sếp muốn test
+                ->subject('🎬 [CINEBOOK] Thư chào mừng từ dự án Cinema của sếp Văn Toàn!');
         });
 
         return 'Đã gửi email HTML thành công rực rỡ! Sếp check inbox ngay nha!';
