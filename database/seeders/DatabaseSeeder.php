@@ -187,7 +187,17 @@ class DatabaseSeeder extends Seeder
         }
  
         // ===================== SUBTITLES =====================
-        $subtitle = \App\Models\Subtitle::updateOrCreate(['name' => 'Phụ Đề Tiếng Việt']);
+        $subtitles = collect([
+            'Phụ Đề Tiếng Việt',
+            'Lồng Tiếng Việt',
+            'English',
+            'Không Phụ Đề',
+        ])->mapWithKeys(function (string $name) {
+            $subtitle = \App\Models\Subtitle::updateOrCreate(['name' => $name]);
+
+            return [$name => $subtitle];
+        });
+        $subtitle = $subtitles->get('Phụ Đề Tiếng Việt');
  
         // ===================== ROOMS (mỗi rạp 2 phòng) =====================
         $rooms = [];
