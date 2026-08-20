@@ -56,7 +56,7 @@ class CleanupExpiredTickets extends Command
         });
 
         $count = count($ticketIds);
-        $this->info("Đã dọn dẹp {$count} vé hết hạn.");
+        $this->info("đã xóa {$count} vé hết hạn.");
         Log::info("CleanupExpiredTickets: Removed {$count} expired pending tickets.", ['ids' => $ticketIds]);
     }
 }

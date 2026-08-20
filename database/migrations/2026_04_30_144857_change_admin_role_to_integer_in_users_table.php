@@ -48,13 +48,6 @@ return new class extends Migration
             return;
         }
 
-        if (in_array($driver, ['mysql', 'mariadb'], true)) {
-            DB::statement('UPDATE `Users` SET `admin_role` = CASE WHEN `admin_role` <> 0 THEN 2 ELSE 0 END');
-            DB::statement('ALTER TABLE `Users` MODIFY `admin_role` INT NOT NULL DEFAULT 0');
-
-            return;
-        }
-
         DB::statement('ALTER TABLE "Users" ALTER COLUMN admin_role DROP DEFAULT');
         DB::statement('ALTER TABLE "Users" ALTER COLUMN admin_role TYPE INTEGER USING (CASE WHEN admin_role THEN 2 ELSE 0 END)');
         DB::statement('ALTER TABLE "Users" ALTER COLUMN admin_role SET DEFAULT 0');
@@ -96,13 +89,6 @@ return new class extends Migration
                 Schema::drop('Users');
                 Schema::rename('Users_old', 'Users');
             });
-
-            return;
-        }
-
-        if (in_array($driver, ['mysql', 'mariadb'], true)) {
-            DB::statement('UPDATE `Users` SET `admin_role` = CASE WHEN `admin_role` = 2 THEN 1 ELSE 0 END');
-            DB::statement('ALTER TABLE `Users` MODIFY `admin_role` TINYINT(1) NOT NULL DEFAULT 0');
 
             return;
         }
