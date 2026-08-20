@@ -21,11 +21,8 @@ RUN composer install --no-dev --optimize-autoloader
 # Install frontend
 RUN npm install && npm run build
 
-# Laravel optimize
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
-
-# Expose port (Render dùng PORT env nhưng mình map sau)
+# Expose port
 EXPOSE 10000
 
 # Start app
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD ["sh", "-c", "php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && exec php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
